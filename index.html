@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stopwatch</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* General Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(to right, #141e30, #243b55);
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+        }
+
+        /* Container Style */
+        .container {
+            background-color: #1f2a44;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        label {
+            display: block;
+            font-size: 2.5em;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        /* Button Styles */
+        button {
+            padding: 15px 40px;
+            margin: 10px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s ease;
+            outline: none;
+        }
+
+        .btn-start {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-stop {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-lap {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-reset {
+            background-color: #ffc107;
+            color: #333;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        /* Lap List Style */
+        .lap-list {
+            margin-top: 30px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 0;
+            list-style: none;
+        }
+
+        .lap-list li {
+            background-color: #2a3c58;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 8px;
+            font-size: 1.1em;
+        }
+
+        /* Scrollbar Customization */
+        .lap-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .lap-list::-webkit-scrollbar-thumb {
+            background-color: #007bff;
+            border-radius: 10px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- User Story 3: Label to show time -->
+        <label id="time-display">00:00:00.000</label>
+
+        <!-- User Story 4: Buttons -->
+        <div>
+            <button class="btn btn-start" id="start-stop-btn" onclick="startStop()">Start</button>
+            <button class="btn btn-lap" id="lap-reset-btn" onclick="lapReset()">Lap</button>
+        </div>
+
+        <!-- Lap list -->
+        <ul id="lap-list" class="lap-list"></ul>
+    </div>
+
+    <script>
+        let startTime, intervalId, elapsedTime = 0;
+        let isRunning = false;
+
+        // Function to start/stop the stopwatch
+        function startStop() {
+            if (isRunning) {
+                // Stop the stopwatch
+                clearInterval(intervalId);
+                isRunning = false;
+                document.getElementById('start-stop-btn').innerText = 'Start';
+                document.getElementById('start-stop-btn').classList.remove('btn-stop');
+                document.getElementById('start-stop-btn').classList.add('btn-start');
+                document.getElementById('lap-reset-btn').innerText = 'Reset';
+                document.getElementById('lap-reset-btn').classList.remove('btn-lap');
+                document.getElementById('lap-reset-btn').classList.add('btn-reset');
+            } else {
+                // Start the stopwatch
+                isRunning = true;
+                startTime = Date.now() - elapsedTime;
+                intervalId = setInterval(updateTime, 10);
+                document.getElementById('start-stop-btn').innerText = 'Stop';
+                document.getElementById('start-stop-btn').classList.remove('btn-start');
+                document.getElementById('start-stop-btn').classList.add('btn-stop');
+                document.getElementById('lap-reset-btn').innerText = 'Lap';
+                document.getElementById('lap-reset-btn').classList.remove('btn-reset');
+                document.getElementById('lap-reset-btn').classList.add('btn-lap');
+            }
+        }
+
+        // Function to update the stopwatch time
+        function updateTime() {
+            elapsedTime = Date.now() - startTime;
+            const timeDisplay = document.getElementById('time-display');
+            const time = new Date(elapsedTime);
+            const minutes = String(time.getUTCMinutes()).padStart(2, '0');
+            const seconds = String(time.getUTCSeconds()).padStart(2, '0');
+            const milliseconds = String(time.getUTCMilliseconds()).padStart(3, '0');
+            timeDisplay.innerText = `00:${minutes}:${seconds}.${milliseconds}`;
+        }
+
+        // Function to handle lap/reset button
+        function lapReset() {
+            if (isRunning) {
+                // Lap functionality
+                const lapTime = document.getElementById('time-display').innerText;
+                const lapList = document.getElementById('lap-list');
+                const newLap = document.createElement('li');
+                newLap.innerText = lapTime;
+                lapList.prepend(newLap);
+            } else {
+                // Reset the stopwatch
+                clearInterval(intervalId);
+                elapsedTime = 0;
+                document.getElementById('time-display').innerText = '00:00:00.000';
+                document.getElementById('lap-list').innerHTML = '';
+                document.getElementById('start-stop-btn').innerText = 'Start';
+                document.getElementById('lap-reset-btn').innerText = 'Lap';
+                document.getElementById('lap-reset-btn').classList.remove('btn-reset');
+                document.getElementById('lap-reset-btn').classList.add('btn-lap');
+            }
+        }
+    </script>
+
+</body>
+</html>
+
